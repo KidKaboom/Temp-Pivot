@@ -6,7 +6,7 @@ endif()
 
 cmake_policy(SET CMP0048 NEW)
 
-project(Temp-Pivot VERSION 1.0 DESCRIPTION "Temp-Pivot" LANGUAGES CXX)
+project(tempPivot VERSION 1.0 DESCRIPTION "tempPivot" LANGUAGES CXX)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cgcmake/modules)

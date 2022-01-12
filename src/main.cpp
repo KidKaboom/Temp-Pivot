@@ -1,4 +1,5 @@
-﻿#include "TempPivotContextCommand.h"
+﻿#include "TempPivotContextCmd.h"
+#include "TempPivotToolCmd.h"
 #include "TempPivotManip.h"
 
 #include <maya/MFnPlugin.h>
@@ -9,7 +10,13 @@ MStatus initializePlugin(MObject obj) {
     MFnPlugin plugin(obj, "Justin Tirado", "1.0", "Any");
 
     MStatus status;
-    status = plugin.registerContextCommand(TempPivotContextCommand::name(), &TempPivotContextCommand::creator);
+    status = plugin.registerContextCommand(
+        TempPivotContextCmd::name(), 
+        TempPivotContextCmd::creator,
+        TempPivotToolCmd::name(),
+        TempPivotToolCmd::creator,
+        TempPivotToolCmd::newSyntax
+    );
 
     if (!status)
     {
@@ -37,7 +44,7 @@ MStatus uninitializePlugin(MObject obj) {
     MFnPlugin plugin(obj);
 
     MStatus status;
-    status = plugin.deregisterContextCommand(TempPivotContextCommand::name());
+    status = plugin.deregisterContextCommand(TempPivotContextCmd::name());
     
     if (!status)
     {

@@ -9,7 +9,9 @@
 #include <maya/MPlug.h>
 #include <maya/MVector.h>
 
-MTypeId TempPivotManip::id(0x80026);
+
+
+MTypeId TempPivotManip::id(0x00139d00);
 
 // This function is a utility that can be used to extract vector values from
 // plugs.

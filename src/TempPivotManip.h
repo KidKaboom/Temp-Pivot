@@ -7,7 +7,7 @@
 class TempPivotManip : public MPxManipContainer
 {
 public:
-    static const MTypeId id() { return 0x00139d00; };
+    static MTypeId  id;
     static const MString name() { return "tempPivotManip"; }
     static void* creator() { return new TempPivotManip(); }
     static MStatus initialize() { return MPxManipContainer::initialize(); }
@@ -23,6 +23,8 @@ public:
 
 private:
     MDagPath fRotateManip;
+    MDagPath fTranslateManip;
     MDagPath fStateManip;
+    MDagPath fToggleManip;
     unsigned rotatePlugIndex;
 };

@@ -6,6 +6,7 @@ class TempPivotContext : public MPxSelectionContext
 {
     public:
         TempPivotContext();
+
         void toolOnSetup(MEvent& event) override;
         void toolOffCleanup() override;
         
@@ -13,6 +14,6 @@ class TempPivotContext : public MPxSelectionContext
         static void updateManipulators(void* data);
 
     private:
-        MCallbackId id1;
+        MCallbackId id1 = 0;
 };
 

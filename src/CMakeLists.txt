@@ -5,11 +5,11 @@
     "TempPivotContext.h" 
     "TempPivotContext.cpp" 
     "TempPivotManip.h"
-  "TempPivotManip.cpp")
+  "TempPivotManip.cpp" "TempPivotCmd.h" "TempPivotCmd.cpp")
 
 find_package(Maya REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} "TempPivotContextCommand.h"  "TempPivotContext.h" "TempPivotContext.cpp" "TempPivotManip.h" "TempPivotManip.cpp")
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} "TempPivotContextCommand.h"  "TempPivotContext.h" "TempPivotContext.cpp" "TempPivotManip.h" "TempPivotManip.cpp" "TempPivotCmd.h" "TempPivotCmd.cpp")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Maya::Maya)
 target_include_directories(${PROJECT_NAME} 

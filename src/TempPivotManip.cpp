@@ -2,10 +2,14 @@
 
 #include <maya/MFnRotateManip.h>
 #include <maya/MFnStateManip.h>
+#include <maya/MFnFreePointTriadManip.h>
+#include <maya/MFnToggleManip.h>
 #include <maya/MGlobal.h>
 #include <maya/MEulerRotation.h>
 #include <maya/MPlug.h>
 #include <maya/MVector.h>
+
+MTypeId TempPivotManip::id(0x80026);
 
 // This function is a utility that can be used to extract vector values from
 // plugs.
@@ -55,6 +59,10 @@ MStatus TempPivotManip::createChildren()
     stateManip.setMaxStates(4);
     stateManip.setInitialState(0);
 
+    //
+    fTranslateManip = addFreePointTriadManip("TranslateManip", "translate");
+    fToggleManip = addToggleManip("ToggleManip", "toggle");
+
     return stat;
 }
 
@@ -82,6 +90,15 @@ MStatus TempPivotManip::connectToDependNode(const MObject& node)
     // to a convenient location.
     //
     MPlug tPlug = nodeFn.findPlug("translate", true, &stat);
+
+    // FreePointTriadManip
+    //
+    MFnFreePointTriadManip freePointTriadManipFn(fTranslateManip);
+
+    if (MStatus::kFailure != stat) {
+        freePointTriadManipFn.connectToPointPlug(tPlug);
+    }
+
     // To avoid having the object jump back to the default rotation when the
     // manipulator is first used, extract the existing rotation from the node
     // and set it as the initial rotation on the manipulator.

@@ -7,10 +7,10 @@
 #include <maya/MFnDependencyNode.h>
 #include <maya/MPlug.h>
 
+
 TempPivotContext::TempPivotContext()
 {
-    //MString str("Plugin Temp Pivot Manipulator");
-    setTitleString("Plugin Temp Pivot Manipulator");
+    setTitleString("Temp Pivot");
 }
 
 void TempPivotContext::toolOnSetup(MEvent&)
@@ -18,6 +18,7 @@ void TempPivotContext::toolOnSetup(MEvent&)
     //MString str("Rotate the object using the rotation handles");
     setHelpString("Rotate the object using the rotation handles.");
     updateManipulators(this);
+
     MStatus status;
 
     id1 = MModelMessage::addCallback(
@@ -83,7 +84,7 @@ void TempPivotContext::updateManipulators(void* data)
 
             // Add manipulator to the selected object
             //
-            MString manipName("exampleRotateManip");
+            MString manipName("tempPivotManip");
             MObject manipObject;
 
             TempPivotManip* manipulator =

@@ -9,7 +9,7 @@ MStatus initializePlugin(MObject obj) {
     MFnPlugin plugin(obj, "Justin Tirado", "1.0", "Any");
 
     MStatus status;
-    status = plugin.registerContextCommand(TempPivotContextCommand::name(), TempPivotContextCommand::creator);
+    status = plugin.registerContextCommand(TempPivotContextCommand::name(), &TempPivotContextCommand::creator);
 
     if (!status)
     {
@@ -19,9 +19,9 @@ MStatus initializePlugin(MObject obj) {
 
     status = plugin.registerNode(
         TempPivotManip::name(), 
-        TempPivotManip::id(),
-        TempPivotManip::creator,
-        TempPivotManip::initialize,
+        TempPivotManip::id,
+        &TempPivotManip::creator,
+        &TempPivotManip::initialize,
         MPxNode::kManipContainer
     );
 
@@ -45,7 +45,7 @@ MStatus uninitializePlugin(MObject obj) {
         return status;
     }
 
-    status = plugin.deregisterNode(TempPivotManip::id());
+    status = plugin.deregisterNode(TempPivotManip::id);
 
     if (!status) {
         MGlobal::displayError("Error deregistering manipulator node.");

@@ -1,22 +1,15 @@
 #include "TempPivotToolCmd.h"
+#include "TempPivotFlags.h"
 
 #include <maya/MDGModifier.h>
 #include <maya/MArgDatabase.h>
+#include <maya/MString.h>
+#include <maya/MGlobal.h>
+#include <maya/MItSelectionList.h>
+#include <maya/MSelectionList.h>
+#include <maya/MDagPath.h>
+#include <maya/MFnTransform.h>
 
-#define kTypeFlag "-t"
-#define kTypeFlagLong "-type"
-#define kTypeCenter "center"
-#define kTypeLastObject "last"
-#define kTypeCustom "custom"
-#define kPositionFlag "-pos"
-#define kPositionFlagLong "-position"
-#define kLastFlag "-las"
-#define kLastFlagLong "-last"
-#define kAlignFlag "-a"
-#define kAlignFlagLong "-align"
-#define kAlignWorld "world"
-#define kAlignLocal "local"
-#define kAlignGimbal "gimbal "
 
 MSyntax TempPivotToolCmd::newSyntax()
 {
@@ -150,6 +143,37 @@ MStatus TempPivotToolCmd::redoIt()
 {
 	MStatus status = MS::kSuccess;
 
+	// Create a selection list iterator
+	//
+	MSelectionList slist;
+	MGlobal::getActiveSelectionList(slist);
+	MItSelectionList iter(slist, MFn::kInvalid, &status);
+
+	if (MS::kSuccess == status) {
+		MDagPath    mdagPath;       // Item dag path
+		MObject     mComponent;     // Current component
+		MSpace::Space spc = MSpace::kWorld;
+
+		// Translate all selected objects
+		//
+		for (; !iter.isDone(); iter.next())
+		{
+			// Get path and possibly a component
+			//
+			iter.getDagPath(mdagPath, mComponent);
+			MFnTransform transFn(mdagPath, &status);
+
+			/*if (MS::kSuccess == status) {
+				status = transFn.translateBy(vector, spc);
+				CHECKRESULT(stat, "Error doing translate on transform");
+				continue;
+			}*/
+		}
+	}
+	else {
+		cerr << "Error creating selection list iterator" << endl;
+	}
+
 	return status;
 }
 
@@ -161,7 +185,15 @@ MStatus TempPivotToolCmd::undoIt()
 MStatus TempPivotToolCmd::finalize()
 {
 	MArgList command;
-	command.addArg(name());
+	command.addArg(commandString());
+	command.addArg(MString(kTypeFlag));
+	command.addArg(mType);
+	command.addArg(MString(kPositionFlag));
+	command.addArg(mPosition);
+	command.addArg(MString(kLastFlag));
+	command.addArg(mIsLast);
+	command.addArg(MString(kAlignFlag));
+	command.addArg(mAlignType);
 	return MPxToolCommand::doFinalize(command);
 }
 

@@ -9,8 +9,6 @@
 #include <maya/MPlug.h>
 #include <maya/MVector.h>
 
-
-
 MTypeId TempPivotManip::id(0x00139d00);
 
 // This function is a utility that can be used to extract vector values from
@@ -63,6 +61,8 @@ MStatus TempPivotManip::createChildren()
 
     //
     fTranslateManip = addFreePointTriadManip("TranslateManip", "translate");
+
+    // Toggle Manip
     fToggleManip = addToggleManip("ToggleManip", "toggle");
 
     return stat;
@@ -98,7 +98,7 @@ MStatus TempPivotManip::connectToDependNode(const MObject& node)
     MFnFreePointTriadManip freePointTriadManipFn(fTranslateManip);
 
     if (MStatus::kFailure != stat) {
-        freePointTriadManipFn.connectToPointPlug(tPlug);
+        //freePointTriadManipFn.connectToPointPlug(tPlug);
     }
 
     // To avoid having the object jump back to the default rotation when the
@@ -113,7 +113,11 @@ MStatus TempPivotManip::connectToDependNode(const MObject& node)
     //
     MFnRotateManip rotateManip(fRotateManip);
     rotateManip.setInitialRotation(existingRotation);
+
+    // Set Default Rotation Mode
     rotateManip.setRotateMode(MFnRotateManip::kObjectSpace);
+    
+    
     rotateManip.displayWithNode(node);
     // Add a callback function to be called when the rotation value changes
     //
@@ -200,4 +204,26 @@ MManipData TempPivotManip::rotationChangedCallback(unsigned index) {
         numericData.setData(manipRotation.x, manipRotation.y, manipRotation.z);
     }
     return MManipData(obj);
+}
+
+MStatus TempPivotManip::doPress()
+{
+    return MS::kUnknownParameter;
+}
+
+MStatus TempPivotManip::doDrag()
+{
+    return MS::kUnknownParameter;
+}
+
+MStatus TempPivotManip::doRelease()
+{
+    // Custom release handling
+    updateManipLocations();
+    // Let Maya do it's work too
+    return MS::kUnknownParameter;
+}
+
+void TempPivotManip::updateManipLocations()
+{
 }

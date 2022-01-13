@@ -11,11 +11,11 @@
 TempPivotContext::TempPivotContext()
 {
     setTitleString("Temp Pivot");
+    //setImage();
 }
 
 void TempPivotContext::toolOnSetup(MEvent&)
 {
-    //MString str("Rotate the object using the rotation handles");
     setHelpString("Rotate the object using the rotation handles.");
     updateManipulators(this);
 

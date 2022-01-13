@@ -17,6 +17,12 @@ public:
 
     MStatus createChildren() override;
     MStatus connectToDependNode(const MObject& node) override;
+
+    MStatus doPress() override;
+    MStatus doDrag() override;
+    MStatus doRelease() override;
+
+    void updateManipLocations();
     
     // Callback function
     MManipData rotationChangedCallback(unsigned index);

@@ -11,6 +11,8 @@
 TempPivotContext::TempPivotContext()
 {
     setTitleString("Temp Pivot");
+    //MGlobal::displayWarning("Missing tool icon.");
+    //setImage();
 }
 
 void TempPivotContext::toolOnSetup(MEvent&)
@@ -20,7 +22,7 @@ void TempPivotContext::toolOnSetup(MEvent&)
 
     MStatus status;
 
-    id1 = MModelMessage::addCallback(
+    mId = MModelMessage::addCallback(
         MModelMessage::kActiveListModified,
         updateManipulators,
         this, 
@@ -35,7 +37,7 @@ void TempPivotContext::toolOnSetup(MEvent&)
 void TempPivotContext::toolOffCleanup()
 {
     MStatus status;
-    status = MModelMessage::removeCallback(id1);
+    status = MModelMessage::removeCallback(mId);
 
     if (!status) {
         MGlobal::displayError("Model remove callback failed");
@@ -64,6 +66,34 @@ bool TempPivotContext::isDependFree(MFnDependencyNode& node)
     }
 
     return true;
+}
+
+MStatus TempPivotContext::doPress(MEvent& event)
+{
+    MStatus status = MPxSelectionContext::doPress(event);
+
+    if (!isSelecting())
+    {
+        mCmd = (TempPivotToolCmd*)newToolCommand();
+    }
+    return status;
+}
+
+MStatus TempPivotContext::doDrag(MEvent& event)
+{
+    MStatus status = MPxSelectionContext::doDrag(event);
+    return status;
+}
+
+MStatus TempPivotContext::doRelease(MEvent& event)
+{
+    MStatus status = MPxSelectionContext::doRelease(event);
+
+    if (!isSelecting())
+    {
+        status = mCmd->finalize();
+    }
+    return status;
 }
 
 void TempPivotContext::updateManipulators(void* data)

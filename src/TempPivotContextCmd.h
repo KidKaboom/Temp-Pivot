@@ -1,3 +1,6 @@
+#ifndef TEMPPIVOTCONTEXTCMD_HEADER
+#define TEMPPIVOTCONTEXTCMD_HEADER
+
 #include "TempPivotContext.h"
 
 #include <maya/MPxContextCommand.h>
@@ -18,3 +21,5 @@ class TempPivotContextCmd : public MPxContextCommand
 	private:
 		TempPivotContext* mCtx;
 };
+
+#endif

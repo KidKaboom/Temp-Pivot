@@ -14,8 +14,7 @@ MStatus initializePlugin(MObject obj) {
         TempPivotContextCmd::name(), 
         &TempPivotContextCmd::creator,
         TempPivotToolCmd::name(),
-        &TempPivotToolCmd::creator,
-        &TempPivotToolCmd::newSyntax
+        &TempPivotToolCmd::creator
     );
 
     if (!status)

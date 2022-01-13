@@ -1,3 +1,6 @@
+#ifndef TEMPPIVOTMANIP_HEADER
+#define TEMPPIVOTMANIP_HEADER
+
 #include <maya/MPxManipContainer.h>
 #include <maya/MGlobal.h>
 #include <maya/MDagPath.h>
@@ -34,3 +37,5 @@ private:
     MDagPath fToggleManip;
     unsigned rotatePlugIndex;
 };
+
+#endif

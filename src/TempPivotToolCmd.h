@@ -1,3 +1,6 @@
+#ifndef TEMPPIVOTTOOLCMD_HEADER
+#define TEMPPIVOTTOOLCMD_HEADER
+
 #include <vector>
 
 #include <maya/MPxToolCommand.h>
@@ -26,18 +29,10 @@ public:
     MStatus undoIt() override;
     bool isUndoable() const override { return true; }
     MStatus finalize() override;
-    //void setVector(double x, double y, double z) { delta.x = x; delta.y = y; delta.z = z; }
-
-    void setPosition(MPoint position) { mPosition = position; }
 
 private:
-    MStatus parseArgs(const MArgList& args);
-    MVector mRotation;
-    MString mType;
-    MPoint mPosition;
-    bool mIsLast;
-    MString mAlignType;
-
     MMatrix parentMatrix;
     MMatrixArray childrenMatrix;
 };
+
+#endif

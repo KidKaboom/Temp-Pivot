@@ -1,5 +1,5 @@
 #include "TempPivotContextCmd.h"
-#include "TempPivotFlags.h"
+#include "macros.h"
 
 #include <maya/MGlobal.h>
 #include <maya/MPoint.h>

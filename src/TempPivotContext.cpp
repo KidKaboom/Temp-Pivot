@@ -4,15 +4,13 @@
 #include <maya/MModelMessage.h>
 #include <maya/MGlobal.h>
 #include <maya/MItSelectionList.h>
-#include <maya/MFnDependencyNode.h>
-#include <maya/MPlug.h>
+#include <maya/MObjectArray.h>
+#include <maya/MDagPathArray.h>
 
 
 TempPivotContext::TempPivotContext()
 {
     setTitleString("Temp Pivot");
-    MGlobal::displayWarning("Missing tool icon.");
-    //setImage();
 }
 
 void TempPivotContext::toolOnSetup(MEvent&)
@@ -46,68 +44,122 @@ void TempPivotContext::toolOffCleanup()
     MPxContext::toolOffCleanup();
 }
 
+bool TempPivotContext::isDependFree(MFnDependencyNode& node)
+{
+
+    // Check Translation
+    MPlug tPlug = node.findPlug("translate", true);
+
+    if (!tPlug.isChannelBoxFlagSet())
+    {
+        return false;
+    }
+
+    // Check Rotation
+    MPlug rPlug = node.findPlug("rotate", true);
+
+    if (!rPlug.isChannelBoxFlagSet())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void TempPivotContext::updateManipulators(void* data)
 {
-    MStatus stat = MStatus::kSuccess;
+    MStatus status = MStatus::kSuccess;
 
+    // Update Manipulators
     TempPivotContext* ctxPtr = (TempPivotContext*)data;
     ctxPtr->deleteManipulators();
 
-    // Add the rotate manipulator to each selected object.  This produces 
-    // behavior different from the default rotate manipulator behavior.  Here,
-    // a distinct rotate manipulator is attached to every object.
-    // 
+    // Get Active Selected
     MSelectionList list;
-    stat = MGlobal::getActiveSelectionList(list);
+    status = MGlobal::getActiveSelectionList(list);
+    MItSelectionList iter(list, MFn::kInvalid, &status);
 
-    MItSelectionList iter(list, MFn::kInvalid, &stat);
+    if (MS::kSuccess == status) 
+    {
+        MObjectArray objects;
 
-    if (MS::kSuccess == stat) {
-        for (; !iter.isDone(); iter.next()) {
+        for (; !iter.isDone(); iter.next()) 
+        {
             // Make sure the selection list item is a depend node and has the
             // required plugs before manipulating it.
-            //
+
             MObject dependNode;
             iter.getDependNode(dependNode);
+
             if (dependNode.isNull() || !dependNode.hasFn(MFn::kDependencyNode))
             {
-                MGlobal::displayWarning("Object in selection list is not "
-                    "a depend node.");
-                continue;
-            }
-            MFnDependencyNode dependNodeFn(dependNode);
-            /* MPlug rPlug = */ dependNodeFn.findPlug("rotate", true, &stat);
-            if (!stat) {
-                MGlobal::displayWarning("Object cannot be manipulated: " +
-                    dependNodeFn.name());
+                MGlobal::displayWarning("Object in selection list is not a depend node.");
                 continue;
             }
 
-            // Add manipulator to the selected object
-            //
+            MFnDependencyNode dependNodeFn(dependNode);
+
+            //// Check Translation
+            //MPlug tPlug = dependNodeFn.findPlug("translate", true, &status);
+
+            //if (!status)
+            //{
+            //    MGlobal::displayWarning("Object cannot be manipulated: " + dependNodeFn.name());
+            //    continue;
+            //}
+
+            //// Check Rotation
+            //MPlug rPlug = dependNodeFn.findPlug("rotate", true, &status);
+
+            //if (!status) 
+            //{
+            //    MGlobal::displayWarning("Object cannot be manipulated: " + dependNodeFn.name());
+            //    continue;
+            //}
+
+            if (!isDependFree(dependNodeFn))
+            {
+                MGlobal::displayWarning("Object cannot be manipulated: " + dependNodeFn.name());
+                continue;
+            }
+
+            // Append
+            objects.append(dependNode);
+        }
+
+        if (objects.length() == 0)
+        {
+            return;
+        }
+        else
+        {
+            // Create manipulator
             MString manipName("tempPivotManip");
             MObject manipObject;
 
-            TempPivotManip* manipulator =
-                (TempPivotManip*)TempPivotManip::newManipulator(
-                    manipName,
-                    manipObject);
+            TempPivotManip* manipulator = (TempPivotManip*)TempPivotManip::newManipulator(manipName, manipObject);
 
-            if (NULL != manipulator) 
+            if (NULL != manipulator)
             {
                 // Add the manipulator
-                //
                 ctxPtr->addManipulator(manipObject);
 
-                // Connect the manipulator to the object in the selection list.
-                //
-                if (!manipulator->connectToDependNode(dependNode))
+                for (int x = 0; x < objects.length(); x++)
                 {
-                    MGlobal::displayWarning(
-                        "Error connecting manipulator to object: " + dependNodeFn.name()
-                    );
+                    MObject object = objects[x];
+
+                    // Connect the manipulator to the object in the selection list.
+                    if (!manipulator->connectToDependNode(object))
+                    {
+                        MFnDependencyNode dependNodeFn(object);
+                        MGlobal::displayWarning("Error connecting manipulator to object: " + dependNodeFn.name());
+                    }
                 }
             }
         }
+        
+        
     }
 }
+
+

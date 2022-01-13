@@ -12,7 +12,6 @@ MPxContext* TempPivotContextCmd::makeObj()
 	return mCtx; 
 }
 
-
 MStatus TempPivotContextCmd::appendSyntax()
 {
 	MSyntax syntax = this->syntax();

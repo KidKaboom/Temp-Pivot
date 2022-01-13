@@ -36,7 +36,7 @@ MVector vectorPlugValue(const MPlug& plug) {
 
 MStatus TempPivotManip::createChildren()
 {
-    MStatus stat = MStatus::kSuccess;
+    MStatus status = MStatus::kSuccess;
     // Add the rotation manip
     //
     fRotateManip = addRotateManip("RotateManip", "rotation");
@@ -65,39 +65,39 @@ MStatus TempPivotManip::createChildren()
     // Toggle Manip
     fToggleManip = addToggleManip("ToggleManip", "toggle");
 
-    return stat;
+    return status;
 }
 
 MStatus TempPivotManip::connectToDependNode(const MObject& node)
 {
-    MStatus stat;
+    MStatus status;
     // Find the rotate and rotatePivot plugs on the node.  These plugs will 
     // be attached either directly or indirectly to the manip values on the
     // rotate manip.
     //
     MFnDependencyNode nodeFn(node);
-    MPlug rPlug = nodeFn.findPlug("rotate", true, &stat);
-    if (!stat)
+    MPlug rPlug = nodeFn.findPlug("rotate", true, &status);
+    if (!status)
     {
         MGlobal::displayError("Could not find rotate plug on node");
-        return stat;
+        return status;
     }
-    MPlug rcPlug = nodeFn.findPlug("rotatePivot", true, &stat);
-    if (!stat)
+    MPlug rcPlug = nodeFn.findPlug("rotatePivot", true, &status);
+    if (!status)
     {
         MGlobal::displayError("Could not find rotatePivot plug on node");
-        return stat;
+        return status;
     }
     // If the translate pivot exists, it will be used to move the state manip
     // to a convenient location.
     //
-    MPlug tPlug = nodeFn.findPlug("translate", true, &stat);
+    MPlug tPlug = nodeFn.findPlug("translate", true, &status);
 
     // FreePointTriadManip
     //
     MFnFreePointTriadManip freePointTriadManipFn(fTranslateManip);
 
-    if (MStatus::kFailure != stat) {
+    if (MStatus::kFailure != status) {
         //freePointTriadManipFn.connectToPointPlug(tPlug);
     }
 
@@ -143,7 +143,7 @@ MStatus TempPivotManip::connectToDependNode(const MObject& node)
     addPlugToInViewEditor(rzPlug);
     finishAddingManips();
     MPxManipContainer::connectToDependNode(node);
-    return stat;
+    return status;
 }
 
 MManipData TempPivotManip::rotationChangedCallback(unsigned index) {

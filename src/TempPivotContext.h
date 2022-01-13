@@ -4,6 +4,8 @@
 #include <maya/MVector.h>
 #include <maya/MString.h>
 #include <maya/MToolsInfo.h>
+#include <maya/MPlug.h>
+#include <maya/MFnDependencyNode.h>
 
 class TempPivotContext : public MPxSelectionContext
 {
@@ -15,6 +17,7 @@ class TempPivotContext : public MPxSelectionContext
         
         // Callback issued when selection list changes
         static void updateManipulators(void* data);
+        static bool isDependFree(MFnDependencyNode &node);
 
         void setType(MString type) { mType = type; MToolsInfo::setDirtyFlag(*this); }
         void setIsLast(bool value) { mIsLast = value; MToolsInfo::setDirtyFlag(*this); }

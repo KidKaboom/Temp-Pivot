@@ -9,13 +9,12 @@ class TempPivotContextCmd : public MPxContextCommand
 	public:
 		static const MString name() { return "tempPivotCtx"; }
 		static void* creator() { return new TempPivotContextCmd; }
-		//static MSyntax newSyntax();
 
 		TempPivotContextCmd() {}
 		MPxContext* makeObj();
-
+		MStatus doEditFlags();
 		MStatus appendSyntax();
 	
 	private:
-		TempPivotContext* ctx;
+		TempPivotContext* mCtx;
 };

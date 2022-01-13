@@ -11,6 +11,7 @@
 TempPivotContext::TempPivotContext()
 {
     setTitleString("Temp Pivot");
+    MGlobal::displayWarning("Missing tool icon.");
     //setImage();
 }
 

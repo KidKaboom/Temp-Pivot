@@ -9,23 +9,6 @@
 #include <maya/MMatrix.h>
 #include <maya/MMatrixArray.h>
 
-class RotationCache
-{
-public:
-    RotationCache() : mData() {}
-    ~RotationCache() { mData.clear(); }
-
-    void clear() { mData.clear(); }
-    size_t length() { return mData.size(); }
-    std::vector<MMatrix*> cache() { return mData; }
-    void add(MMatrix* matrix){ mData.push_back(matrix);}
-
-    MMatrix* relativeMatrix;
-
-private:
-    std::vector<MMatrix*> mData;
-};
-
 
 class TempPivotToolCmd : public MPxToolCommand
 {
@@ -55,5 +38,6 @@ private:
     bool mIsLast;
     MString mAlignType;
 
-    RotationCache* mCache;
+    MMatrix parentMatrix;
+    MMatrixArray childrenMatrix;
 };

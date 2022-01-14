@@ -12,9 +12,9 @@ MStatus initializePlugin(MObject obj) {
     MStatus status;
     status = plugin.registerContextCommand(
         TempPivotContextCmd::name(), 
-        &TempPivotContextCmd::creator,
+        TempPivotContextCmd::creator,
         TempPivotToolCmd::name(),
-        &TempPivotToolCmd::creator
+        TempPivotToolCmd::creator
     );
 
     if (!status)
@@ -26,8 +26,8 @@ MStatus initializePlugin(MObject obj) {
     status = plugin.registerNode(
         TempPivotManip::name(), 
         TempPivotManip::id,
-        &TempPivotManip::creator,
-        &TempPivotManip::initialize,
+        TempPivotManip::creator,
+        TempPivotManip::initialize,
         MPxNode::kManipContainer
     );
 

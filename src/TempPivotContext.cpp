@@ -7,17 +7,19 @@
 #include <maya/MObjectArray.h>
 #include <maya/MDagPathArray.h>
 
-
 TempPivotContext::TempPivotContext()
 {
     setTitleString("Temp Pivot");
-    //MGlobal::displayWarning("Missing tool icon.");
-    //setImage();
 }
 
 void TempPivotContext::toolOnSetup(MEvent&)
 {
     setHelpString("Rotate the object using the rotation handles.");
+
+    mCmd = 0;
+    mHasCmd = false;
+    mManip = NULL;
+
     updateManipulators(this);
 
     MStatus status;
@@ -34,6 +36,14 @@ void TempPivotContext::toolOnSetup(MEvent&)
     }
 }
 
+void TempPivotContext::clear()
+{
+    deleteManipulators();
+    mCmd = 0;
+    mHasCmd = false;
+    mHasManip = false;
+}
+
 void TempPivotContext::toolOffCleanup()
 {
     MStatus status;
@@ -43,24 +53,27 @@ void TempPivotContext::toolOffCleanup()
         MGlobal::displayError("Model remove callback failed");
     }
 
+    clear();
+
     MPxContext::toolOffCleanup();
 }
 
 bool TempPivotContext::isDependFree(MFnDependencyNode& node)
 {
+    MStatus status;
 
     // Check Translation
-    MPlug tPlug = node.findPlug("translate", true);
+    MPlug tPlug = node.findPlug("translate", true, &status);
 
-    if (!tPlug.isChannelBoxFlagSet())
+    if (!status)
     {
         return false;
     }
 
     // Check Rotation
-    MPlug rPlug = node.findPlug("rotate", true);
+    MPlug rPlug = node.findPlug("rotate", true, &status);
 
-    if (!rPlug.isChannelBoxFlagSet())
+    if (!status)
     {
         return false;
     }
@@ -68,30 +81,31 @@ bool TempPivotContext::isDependFree(MFnDependencyNode& node)
     return true;
 }
 
-MStatus TempPivotContext::doPress(MEvent& event)
+MStatus TempPivotContext::doPress(MEvent& event, MHWRender::MUIDrawManager& drawMgr, const MHWRender::MFrameContext& context)
 {
-    MStatus status = MPxSelectionContext::doPress(event);
+    MStatus status = MPxSelectionContext::doPress(event, drawMgr, context);
 
     if (!isSelecting())
     {
-        mCmd = (TempPivotToolCmd*)newToolCommand();
+        if (mHasManip && mHasCmd)
+        {
+            mCmd->rotateManip = mManip->rotateDagPath();
+            mCmd->redoIt();
+        }
     }
     return status;
 }
 
-MStatus TempPivotContext::doDrag(MEvent& event)
+MStatus TempPivotContext::doRelease(MEvent& event, MHWRender::MUIDrawManager& drawMgr, const MHWRender::MFrameContext& context)
 {
-    MStatus status = MPxSelectionContext::doDrag(event);
-    return status;
-}
-
-MStatus TempPivotContext::doRelease(MEvent& event)
-{
-    MStatus status = MPxSelectionContext::doRelease(event);
+    MStatus status = MPxSelectionContext::doRelease(event, drawMgr, context);
 
     if (!isSelecting())
     {
-        status = mCmd->finalize();
+        if (mHasManip && mHasCmd)
+        {
+            mCmd->finalize();
+        }
     }
     return status;
 }
@@ -102,8 +116,11 @@ void TempPivotContext::updateManipulators(void* data)
 
     // Update Manipulators
     TempPivotContext* ctxPtr = (TempPivotContext*)data;
-    ctxPtr->deleteManipulators();
 
+    //ctxPtr->deleteManipulators();
+    //ctxPtr->mHasManip = false;
+    ctxPtr->clear();
+    
     // Get Active Selected
     MSelectionList list;
     status = MGlobal::getActiveSelectionList(list);
@@ -127,25 +144,8 @@ void TempPivotContext::updateManipulators(void* data)
                 continue;
             }
 
+            // Check Depend Node
             MFnDependencyNode dependNodeFn(dependNode);
-
-            //// Check Translation
-            //MPlug tPlug = dependNodeFn.findPlug("translate", true, &status);
-
-            //if (!status)
-            //{
-            //    MGlobal::displayWarning("Object cannot be manipulated: " + dependNodeFn.name());
-            //    continue;
-            //}
-
-            //// Check Rotation
-            //MPlug rPlug = dependNodeFn.findPlug("rotate", true, &status);
-
-            //if (!status) 
-            //{
-            //    MGlobal::displayWarning("Object cannot be manipulated: " + dependNodeFn.name());
-            //    continue;
-            //}
 
             if (!isDependFree(dependNodeFn))
             {
@@ -172,7 +172,13 @@ void TempPivotContext::updateManipulators(void* data)
             if (NULL != manipulator)
             {
                 // Add the manipulator
+                ctxPtr->mManip = manipulator;
                 ctxPtr->addManipulator(manipObject);
+                ctxPtr->mHasManip = true;
+                
+                // Add the command
+                ctxPtr->mCmd = (TempPivotToolCmd*)ctxPtr->newToolCommand(); 
+                ctxPtr->mHasCmd = true;
 
                 for (int x = 0; x < objects.length(); x++)
                 {
@@ -186,9 +192,7 @@ void TempPivotContext::updateManipulators(void* data)
                     }
                 }
             }
-        }
-        
-        
+        }  
     }
 }
 
